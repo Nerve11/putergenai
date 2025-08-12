@@ -33,6 +33,17 @@ def generate_local_image(prompt, filename='local_image.png', bg_color='#496d89',
 
 
 def sanitize_string(s, allow_empty=False, allow_path=False):
+    """
+    Sanitize a string input.
+    Parameters:
+        s (str): Input string to sanitize.
+        allow_empty (bool): If False, raises error on empty string.
+        allow_path (bool): If True, allows path-like characters.
+    Returns:
+        str: Sanitized string.
+    Raises:
+        ValueError: If input is not valid.
+    """
     if not isinstance(s, str):
         raise ValueError("Input must be a string.")
     s = s.strip()
@@ -90,12 +101,19 @@ class PuterApp(ctk.CTk):
         # Section for API key entry
         self.api_key_section = ctk.CTkFrame(self.main_frame)
         ctk.CTkLabel(self.api_key_section, text="Enter API Key:").pack(side="left", padx=5)
-        self.api_key_entry = tk.Entry(self.api_key_section, show="*")
+        self.api_key_entry = ctk.CTkEntry(self.api_key_section, show="*")
         self.api_key_entry.pack(side="left", padx=5)
         def save_api_key():
             selected_api = self.api_var.get()
             key = self.api_key_entry.get()
             self.api_keys[selected_api] = key
+            # Save API keys to a local file for persistence
+            try:
+                with open("api_keys.cfg", "w") as f:
+                    for k, v in self.api_keys.items():
+                        f.write(f"{k}={v}\n")
+            except Exception as e:
+                print(f"Error saving API keys: {e}")
             mbox.showinfo("API Key Saved", f"API key for {selected_api} saved.")
         ctk.CTkButton(self.api_key_section, text="Save Key", command=save_api_key).pack(side="left", padx=5)
 
@@ -133,21 +151,28 @@ class PuterApp(ctk.CTk):
     def _get_api_key(self, api_name):
         if self.api_keys.get(api_name):
             return self.api_keys[api_name]
-        # Popup for API key entry
-        key_win = tk.Toplevel(self)
+        # Popup for API key entry (use customtkinter for consistency)
+        key_win = ctk.CTkToplevel(self)
         key_win.title(f"Enter {api_name} API Key")
         key_win.geometry("350x120")
-        tk.Label(key_win, text=f"{api_name} API Key:").pack(pady=10)
-        key_entry = tk.Entry(key_win, show="*")
+        ctk.CTkLabel(key_win, text=f"{api_name} API Key:").pack(pady=10)
+        key_entry = ctk.CTkEntry(key_win, show="*")
         key_entry.pack(pady=5)
         result = {"key": None}
         def save_key():
             result["key"] = key_entry.get()
             self.api_keys[api_name] = result["key"]
+            try:
+                with open("api_keys.cfg", "w") as f:
+                    for k, v in self.api_keys.items():
+                        f.write(f"{k}={v}\n")
+            except Exception as e:
+                print(f"Error saving API keys: {e}")
             key_win.destroy()
-        tk.Button(key_win, text="Save", command=save_key).pack(pady=10)
+        ctk.CTkButton(key_win, text="Save", command=save_key).pack(pady=10)
         key_win.wait_window()
         return result["key"]
+
     def _send_image_api(self):
         prompt = self.prompt_entry.get()
         if not prompt:
@@ -198,10 +223,13 @@ class PuterApp(ctk.CTk):
                     self.chat_box.insert("end", f"[Replicate] Error: {resp.text}\n\n")
                     self.status_label.configure(text="Replicate API error.", text_color="red")
             elif api_choice == "DeepAI":
+                key = self._get_api_key("DeepAI")
+                if not key:
+                    self.status_label.configure(text="No DeepAI API key provided.", text_color="red")
+                    return
                 url = "https://api.deepai.org/api/text2img"
-                headers = {"api-key": "quickstart-QUdJIGlzIGNvbWluZy4uLi4K"} # Free demo key
+                headers = {"api-key": key}
                 data = {"text": prompt}
-                import requests
                 resp = requests.post(url, headers=headers, data=data)
                 if resp.status_code == 200:
                     output = resp.json().get("output_url")
@@ -420,7 +448,10 @@ class PuterApp(ctk.CTk):
 
         def generate_and_close():
             bg_color = bg_entry.get() or "#496d89"
-            font_size = int(font_entry.get() or 32)
+            try:
+                font_size = int(font_entry.get() or 32)
+            except ValueError:
+                font_size = 32
             text_color = text_entry.get() or "#ffff00"
             filename = file_entry.get() or "local_image.png"
             fname = generate_local_image(prompt, filename, bg_color, font_size, text_color)
