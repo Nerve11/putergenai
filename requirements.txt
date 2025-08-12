@@ -1,5 +1,6 @@
 requests
-cryptography==45.0.6
 putergenai
 pillow
 customtkinter
+cryptography==45.0.6
+flask
