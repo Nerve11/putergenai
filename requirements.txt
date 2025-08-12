@@ -1,6 +1,6 @@
-requests
-putergenai
-pillow
-customtkinter
+requests==2.32.4
+putergenai==0.1.5
+pillow==11.3.0
+customtkinter==5.2.2
 cryptography==45.0.6
-flask
+flask==3.1.1
