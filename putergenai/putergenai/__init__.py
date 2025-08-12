@@ -1,3 +1,3 @@
-from .putergenai import PuterClient
+from .client import PuterClient
 
-__version__ = '0.1.0'
+__version__ = '0.1.03'
