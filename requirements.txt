@@ -1,2 +1,4 @@
 requests
 putergenai
+pillow
+customtkinter
