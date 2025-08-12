@@ -5,6 +5,7 @@ import os
 from putergenai import PuterClient
 import requests
 from PIL import Image, ImageDraw, ImageFont
+from cryptography.fernet import Fernet
 import customtkinter as ctk
 import tkinter as tk
 import tkinter.messagebox as mbox
@@ -71,7 +72,46 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 class PuterApp(ctk.CTk):
-    def _build_main(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._load_encryption_key()
+        self.api_keys = self._load_api_keys()
+        # ... rest of your __init__ code ...
+
+    def _load_encryption_key(self):
+        self._key_file = "api_keys.key"
+        if os.path.exists(self._key_file):
+            with open(self._key_file, "rb") as f:
+                self._fernet_key = f.read()
+        else:
+            self._fernet_key = Fernet.generate_key()
+            with open(self._key_file, "wb") as f:
+                f.write(self._fernet_key)
+        self._fernet = Fernet(self._fernet_key)
+
+    def _encrypt(self, plaintext):
+        return self._fernet.encrypt(plaintext.encode()).decode()
+
+    def _decrypt(self, ciphertext):
+        return self._fernet.decrypt(ciphertext.encode()).decode()
+
+    def _load_api_keys(self):
+        api_keys = {}
+        if os.path.exists("api_keys.cfg"):
+            try:
+                with open("api_keys.cfg", "r") as f:
+                    for line in f:
+                        if "=" in line:
+                            k, v = line.strip().split("=", 1)
+                            try:
+                                api_keys[k] = self._decrypt(v)
+                            except Exception:
+                                # If decryption fails, skip this key
+                                continue
+            except Exception as e:
+                print(f"Error loading API keys: {e}")
+        return api_keys
+
         self.main_frame = ctk.CTkFrame(self)
         self.main_frame.pack(fill="both", expand=True)
 
@@ -165,7 +205,8 @@ class PuterApp(ctk.CTk):
             try:
                 with open("api_keys.cfg", "w") as f:
                     for k, v in self.api_keys.items():
-                        f.write(f"{k}={v}\n")
+                        enc_v = self._encrypt(v)
+                        f.write(f"{k}={enc_v}\n")
             except Exception as e:
                 print(f"Error saving API keys: {e}")
             key_win.destroy()
