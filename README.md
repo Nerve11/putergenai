@@ -227,7 +227,7 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 Built on top of Puter.js—kudos to the team for an innovative API. Inspired by real-world needs for privacy-focused AI tools.
 
-**Maintainer's**:
+**Maintainers**:
 - Nerve11 (@Nerve11)
 - BubblesTheDev (@kernferm)
 - **Last Updated**: August 12, 2025  
