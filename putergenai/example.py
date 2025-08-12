@@ -3,6 +3,7 @@ import logging
 import re
 import os
 from putergenai import PuterClient
+import requests
 from PIL import Image, ImageDraw, ImageFont
 import customtkinter as ctk
 import tkinter as tk
@@ -14,7 +15,7 @@ def generate_local_image(prompt, filename='local_image.png', bg_color='#496d89',
     d = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("arial.ttf", font_size)
-    except:
+    except (IOError, FileNotFoundError):
         font = ImageFont.load_default()
     # Center the text
     try:
@@ -60,7 +61,6 @@ ctk.set_default_color_theme("blue")
 
 class PuterApp(ctk.CTk):
     def _build_main(self):
-        print(f"DEBUG: api_options = {self.api_options}")
         self.main_frame = ctk.CTkFrame(self)
         self.main_frame.pack(fill="both", expand=True)
 
@@ -238,18 +238,18 @@ class PuterApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("PuterGenAI Chat & Image GUI")
-        self.geometry("1000x800")
+        self.geometry("800x600")
         self.resizable(False, False)
         self.client = None
         self.models = []
         self.image_models = [
-            'gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
-            'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-chat-latest',
-            'claude-sonnet-4', 'claude-opus-4', 'claude-3-7-sonnet', 'claude-3-5-sonnet',
-            'gemini-2.0-flash', 'gemini-1.5-flash', 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
-            'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo',
-            'mistral-large-latest', 'pixtral-large-latest', 'codestral-latest', 'google/gemma-2-27b-it', 'grok-beta'
-        ]
+                'gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
+                'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-chat-latest',
+                'claude-sonnet-4', 'claude-opus-4', 'claude-3-7-sonnet', 'claude-3-5-sonnet',
+                'gemini-2.0-flash', 'gemini-1.5-flash', 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+                'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo',
+                'mistral-large-latest', 'pixtral-large-latest', 'codestral-latest', 'google/gemma-2-27b-it', 'grok-beta'
+            ]
         self.selected_model = None
         self.messages = []
         self.options = {}
