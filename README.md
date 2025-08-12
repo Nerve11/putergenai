@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-Passed-brightgreen)](https://github.com/your-repo/putergenai/actions/workflows/tests.yml)
+[![Tests](https://img.shields.io/badge/tests-Passed-brightgreen)](https://github.com/kernferm/putergenai/actions/workflows/tests.yml)
 
 ## Overview
 
