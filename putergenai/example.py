@@ -9,6 +9,7 @@ import customtkinter as ctk
 import tkinter as tk
 import tkinter.messagebox as mbox
 from cryptography.fernet import Fernet
+import stat
 
 def generate_local_image(prompt, filename='local_image.png', bg_color='#496d89', font_size=32, text_color='#ffff00'):
     width, height = 600, 300
@@ -80,13 +81,21 @@ class PuterApp(ctk.CTk):
 
     def _load_encryption_key(self):
         self._key_file = "api_keys.key"
-        if os.path.exists(self._key_file):
+        env_key = os.environ.get("PUTERGENAI_FERNET_KEY")
+        if env_key:
+            self._fernet_key = env_key.encode()
+        elif os.path.exists(self._key_file):
             with open(self._key_file, "rb") as f:
                 self._fernet_key = f.read()
         else:
             self._fernet_key = Fernet.generate_key()
             with open(self._key_file, "wb") as f:
                 f.write(self._fernet_key)
+            # Restrict permissions to user only (Windows)
+            try:
+                os.chmod(self._key_file, stat.S_IREAD | stat.S_IWRITE)
+            except Exception as e:
+                print(f"Warning: Could not set permissions on {self._key_file}: {e}")
         self._fernet = Fernet(self._fernet_key)
 
     def _encrypt(self, plaintext):
@@ -147,14 +156,7 @@ class PuterApp(ctk.CTk):
             selected_api = self.api_var.get()
             key = self.api_key_entry.get()
             self.api_keys[selected_api] = key
-            # Save API keys to a local file for persistence
-            try:
-                with open("api_keys.cfg", "w") as f:
-                    for k, v in self.api_keys.items():
-                        enc_v = self._encrypt(v)
-                        f.write(f"{k}={enc_v}\n")
-            except Exception as e:
-                print(f"Error saving API keys: {e}")
+            self._save_api_keys()
             mbox.showinfo("API Key Saved", f"API key for {selected_api} saved.")
         ctk.CTkButton(self.api_key_section, text="Save Key", command=save_api_key).pack(side="left", padx=5)
 
@@ -203,13 +205,7 @@ class PuterApp(ctk.CTk):
         def save_key():
             result["key"] = key_entry.get()
             self.api_keys[api_name] = result["key"]
-            try:
-                with open("api_keys.cfg", "w") as f:
-                    for k, v in self.api_keys.items():
-                        enc_v = self._encrypt(v)
-                        f.write(f"{k}={enc_v}\n")
-            except Exception as e:
-                print(f"Error saving API keys: {e}")
+            self._save_api_keys()
             key_win.destroy()
         ctk.CTkButton(key_win, text="Save", command=save_key).pack(pady=10)
         key_win.wait_window()
@@ -503,6 +499,27 @@ class PuterApp(ctk.CTk):
 
         gen_btn = tk.Button(options_win, text="Generate", command=generate_and_close)
         gen_btn.pack(pady=10)
+
+# --- Flask Secure Cookie Example ---
+from flask import Flask, make_response, request
+from cryptography.fernet import Fernet
+
+app = Flask("Secure Example")
+fernet = Fernet(Fernet.generate_key())
+
+@app.route('/')
+def index():
+    password = request.args.get("password")
+    if password:
+        encrypted = fernet.encrypt(password.encode()).decode()
+        resp = make_response("Password received (encrypted in cookie)")
+        resp.set_cookie("password", encrypted)
+        return resp
+    return "No password provided"
+
+# Uncomment below to run Flask app
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 if __name__ == "__main__":
     PuterApp().mainloop()
