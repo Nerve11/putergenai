@@ -1,6 +1,6 @@
 # PutergenAI: Python SDK for Puter.js
 
-[![Python Version](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/your-repo/putergenai/actions/workflows/tests.yml)
 
@@ -227,8 +227,88 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 Built on top of Puter.js—kudos to the team for an innovative API. Inspired by real-world needs for privacy-focused AI tools.
 
-**Maintainer**: Nerve11 (@Nerve11)  
-**Last Updated**: August 11, 2025  
-**Version**: 0.1.01  
+**Maintainer's**:
+- Nerve11 (@Nerve11)
+- BubblesTheDev (@kernferm)
+- **Last Updated**: August 12, 2025  
+- **Version**: 0.1.03  
 
-If this SDK saves you time, star the repo! Questions? Open an issue.
+- If this SDK saves you time, star the repo! Questions? Open an issue.
+
+# PutergenAI GUI Application
+
+This repository includes a CustomTkinter-based GUI for PutergenAI, allowing you to chat with AI models, generate images, and manage your Puter.js account visually.
+
+## Features
+- Login with Puter credentials
+- Select from multiple AI models (chat and image)
+- Use 4 free image generation APIs: Hugging Face, Replicate, DeepAI, OpenAI
+- Enter and save API keys for image generation APIs
+- Popup notification when selecting a free API, reminding you to add your API key
+- Section for entering and saving API keys appears when needed
+- Chat and image generation (API and local)
+- Sign Out button to log out and return to login screen
+- Window resizing is disabled for a consistent experience
+
+## How to Use
+1. **Run the app:**
+   ```bash
+   python example.py
+   ```
+2. **Login:** Enter your Puter username and password.
+3. **Select Model:** Choose an AI model for chat or image tasks.
+4. **Select Image Generation API:** Pick one of the free APIs. A popup will remind you to add your API key.
+5. **Enter API Key:** When prompted, enter your API key in the provided field and click "Save Key".
+6. **Chat or Generate Images:** Use the chat box and buttons to interact with the AI or generate images.
+7. **Sign Out:** Click the Sign Out button to log out and return to the login screen.
+
+## Requirements
+- Python 3.8+
+- `putergenai` (see SDK instructions above)
+- `customtkinter`, `Pillow`, `requests`
+
+Install dependencies:
+```bash
+pip install customtkinter pillow requests putergenai
+```
+
+## Notes
+- API keys are required for Hugging Face, Replicate, and OpenAI image generation. DeepAI may work with a demo key.
+- Window size is fixed (800x600) and cannot be resized.
+- All user input is sanitized for security.
+
+For SDK usage and advanced features, see below.
+
+## GUI Example Usage
+
+Below is a sample workflow using the included `example.py` GUI application:
+
+```python
+from putergenai import PuterClient
+import customtkinter as ctk
+import tkinter as tk
+import tkinter.messagebox as mbox
+
+# Launch the GUI
+if __name__ == "__main__":
+    PuterApp().mainloop()
+```
+
+### Main Features in the GUI
+- **Login:** Enter your Puter credentials to access chat and image features.
+- **Model Selection:** Choose from available AI models (chat and image).
+- **Image Generation API Selection:** Pick from Hugging Face, Replicate, DeepAI, or OpenAI. A popup will remind you to add your API key.
+- **API Key Entry:** When a free API is selected, a section appears to enter and save your API key.
+- **Chat & Image Generation:** Use the chat box and buttons to interact with the AI or generate images (API/local).
+- **Sign Out:** Click the Sign Out button to log out and return to the login screen.
+- **Window Size:** The window is fixed at 800x600 and cannot be resized.
+
+### Example GUI Flow
+1. Run the app: `python example.py`
+2. Login with your Puter username and password.
+3. Select a model and an image generation API.
+4. Enter your API key if prompted and save it.
+5. Type a message or image prompt and use the buttons to chat or generate images.
+6. Sign out when finished.
+
+---
