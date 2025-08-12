@@ -5,10 +5,10 @@ import os
 from putergenai import PuterClient
 import requests
 from PIL import Image, ImageDraw, ImageFont
-from cryptography.fernet import Fernet
 import customtkinter as ctk
 import tkinter as tk
 import tkinter.messagebox as mbox
+from cryptography.fernet import Fernet
 
 def generate_local_image(prompt, filename='local_image.png', bg_color='#496d89', font_size=32, text_color='#ffff00'):
     width, height = 600, 300
@@ -106,12 +106,12 @@ class PuterApp(ctk.CTk):
                             try:
                                 api_keys[k] = self._decrypt(v)
                             except Exception:
-                                # If decryption fails, skip this key
                                 continue
             except Exception as e:
                 print(f"Error loading API keys: {e}")
         return api_keys
 
+    def _build_main(self):
         self.main_frame = ctk.CTkFrame(self)
         self.main_frame.pack(fill="both", expand=True)
 
@@ -151,7 +151,8 @@ class PuterApp(ctk.CTk):
             try:
                 with open("api_keys.cfg", "w") as f:
                     for k, v in self.api_keys.items():
-                        f.write(f"{k}={v}\n")
+                        enc_v = self._encrypt(v)
+                        f.write(f"{k}={enc_v}\n")
             except Exception as e:
                 print(f"Error saving API keys: {e}")
             mbox.showinfo("API Key Saved", f"API key for {selected_api} saved.")
