@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "putergenai"
+version = "0.1.6"
+authors = [
+    { name="Nerve11", email="putergenai@outlook.com" },
+    { name="BubblesTheDev", email"bubblesthedev@fnbubbles420.org" },
+]
+description = "A Python client for the Puter API"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/pysnippet/puter-genai"
+"Bug Tracker" = "https://github.com/pysnippet/puter-genai/issues"
+
+[tool.setuptools]
+packages = ["putergenai"]
+package-dir = {"" = "src"}
