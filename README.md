@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/your-repo/putergenai/actions/workflows/tests.yml)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]
 
 ## Overview
 
@@ -27,6 +27,7 @@ For development, clone the repo and install locally:
 
 ```bash
 git clone https://github.com/nerve11/putergenai.git
+git clone https://github.com/kernferm/putergenai.git
 cd putergenai
 pip install -e .
 ```
