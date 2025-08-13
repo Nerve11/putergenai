@@ -1,8 +1,8 @@
 # PutergenAI: Python SDK for Puter.js
 
-[![Python Version](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-Passed-brightgreen)](https://github.com/kernferm/putergenai/actions/workflows/tests.yml)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/your-repo/putergenai/actions/workflows/tests.yml)
 
 ## Overview
 
@@ -311,4 +311,30 @@ if __name__ == "__main__":
 5. Type a message or image prompt and use the buttons to chat or generate images.
 6. Sign out when finished.
 
----
+## Security Features
+
+- API keys are encrypted using Fernet symmetric encryption before being stored on disk (`api_keys.cfg`).
+- The encryption key is stored separately in `api_keys.key` and can be loaded from the environment variable `PUTERGENAI_FERNET_KEY` for enhanced security.
+- File permissions for sensitive files are restricted to user read/write only (on Windows).
+- Sensitive information is never logged or printed to stdout/stderr.
+- Example Flask code demonstrates how to securely store sensitive data in cookies using encryption and the Secure/HttpOnly attributes:
+
+```python
+from flask import Flask, make_response, request
+from cryptography.fernet import Fernet
+
+app = Flask("Secure Example")
+fernet = Fernet(Fernet.generate_key())
+
+@app.route('/')
+def index():
+    password = request.args.get("password")
+    if password:
+        encrypted = fernet.encrypt(password.encode()).decode()
+        resp = make_response("Password received (encrypted in cookie)")
+        resp.set_cookie("password", encrypted, secure=True, httponly=True)
+        return resp
+    return "No password provided"
+```
+
+**Best Practice:** Never store plain-text passwords or sensitive data in cookies. Use session tokens and always set Secure/HttpOnly attributes.
