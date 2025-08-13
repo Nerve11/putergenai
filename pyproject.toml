@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "putergenai"
 version = "0.1.6"
 authors = [
-    { name="Nerve11", email="putergenai@outlook.com" },
-    { name="BubblesTheDev", email"bubblesthedev@fnbubbles420.org" },
+    { name = "Nerve11", email = "putergenai@outlook.com" },
+    { name = "BubblesTheDev", email = "bubblesthedev@fnbubbles420.org" },
 ]
 description = "A Python client for the Puter API"
 readme = "README.md"
@@ -18,7 +18,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "requests",
+    "requests==2.32.4",
+    "putergenai==0.1.5",
+    "pillow==11.3.0",
+    "customtkinter==5.2.2",
+    "cryptography==45.0.6",
+    "flask==3.1.1",
 ]
 
 [project.urls]
@@ -27,4 +32,4 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["putergenai"]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
