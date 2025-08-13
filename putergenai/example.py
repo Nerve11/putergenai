@@ -513,7 +513,7 @@ def index():
     if password:
         encrypted = fernet.encrypt(password.encode()).decode()
         resp = make_response("Password received (encrypted in cookie)")
-        resp.set_cookie("password", encrypted)
+        resp.set_cookie("password", encrypted, secure=True, httponly=True)
         return resp
     return "No password provided"
 
