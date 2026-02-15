@@ -220,7 +220,7 @@ class PuterClient:
             "togetherai:mistralai/Mistral-Small-24B-Instruct-2501": "together-ai",
             "togetherai:marin-community/marin-8b-instruct": "together-ai",
             "togetherai:kwaivgI/kling-1.6-standard": "together-ai",
-            "togetherai:meta-llama/LlamaGuard-3-11B-Vision-Turbo": "together-ai",
+            "togetherai:meta-llama/Meta-Llama-Guard-3-11B-Vision-Turbo": "together-ai",
             "togetherai:black-forest-labs/FLUX.2-flex": "together-ai",
             "togetherai:meta-llama/Meta-Llama-Guard-3-8B": "together-ai",
             "togetherai:deepseek-ai/DeepSeek-R1": "together-ai",
@@ -272,7 +272,7 @@ class PuterClient:
             "togetherai:Qwen/Qwen2.5-VL-72B-Instruct": "together-ai",
             "togetherai:meta-llama/Llama-3-70b-chat-hf": "together-ai",
             "togetherai:black-forest-labs/FLUX.1-kontext-dev": "together-ai",
-            "togetherai:zai-org/GLM-4.5-Air-FP8": "together-ai",
+            "togetherai:zai-org/GLM-4.6": "together-ai",
             "togetherai:black-forest-labs/FLUX.1-pro": "together-ai",
             "togetherai:black-forest-labs/FLUX.1.1-pro": "together-ai",
             "togetherai:meta-llama/Meta-Llama-3-70B-Instruct-Turbo": "together-ai",
@@ -317,7 +317,7 @@ class PuterClient:
             "togetherai:openai/whisper-large-v3": "together-ai",
             "togetherai:canopylabs/orpheus-3b-0.1-ft": "together-ai",
             "togetherai:meta-llama/Llama-3.1-405B-Instruct": "together-ai",
-            "togetherai:meta-llama/Llama-3-70b-hf": "together-ai",
+            "togetherai:meta-llama/Llama-3-70B-hf": "together-ai",
             "togetherai:Qwen/Qwen3-235B-A22B-Thinking-2507": "together-ai",
             "togetherai:Qwen/Qwen2.5-72B-Instruct": "together-ai",
             "togetherai:openai/gpt-oss-20b": "together-ai",
@@ -1794,7 +1794,13 @@ class PuterClient:
         def check_used_model(data: Dict[str, Any], requested_model: str, strict: bool) -> str:
             used_model = None
             if "result" in data and "usage" in data["result"] and data["result"]["usage"]:
-                used_model = data["result"]["usage"][0].get("model", "unknown")
+                usage = data["result"]["usage"]
+                if isinstance(usage, list) and len(usage) > 0:
+                    used_model = usage[0].get("model", "unknown")
+                elif isinstance(usage, dict):
+                    used_model = usage.get("model", data["result"].get("model", "unknown"))
+                else:
+                    used_model = data["result"].get("model", "unknown")
             elif "metadata" in data and "service_used" in data["metadata"]:
                 used_model = data["metadata"].get("service_used", "unknown")
 
