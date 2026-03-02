@@ -4,15 +4,7 @@ import logging
 import socket
 import ssl
 from datetime import datetime, timedelta
-from typing import (
-    Any,
-    AsyncGenerator,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple, Union
 
 import aiohttp
 import certifi
@@ -1226,8 +1218,12 @@ class PuterClient:
         hdrs = dict(headers or {})
         hdrs.update(self._get_auth_headers())
         if return_json:
-            return await self._request_json(method, url, headers=hdrs, params=params, json_body=json_body, data=data)
-        return await self._request_bytes(method, url, headers=hdrs, params=params, json_body=json_body, data=data)
+            return await self._request_json(
+                method, url, headers=hdrs, params=params, json_body=json_body, data=data
+            )
+        return await self._request_bytes(
+            method, url, headers=hdrs, params=params, json_body=json_body, data=data
+        )
 
     async def net_fetch(
         self,
@@ -1246,8 +1242,12 @@ class PuterClient:
         if include_auth:
             hdrs.update(self._get_auth_headers())
         if return_json:
-            return await self._request_json(method, target, headers=hdrs, params=params, json_body=json_body, data=data)
-        return await self._request_bytes(method, target, headers=hdrs, params=params, json_body=json_body, data=data)
+            return await self._request_json(
+                method, target, headers=hdrs, params=params, json_body=json_body, data=data
+            )
+        return await self._request_bytes(
+            method, target, headers=hdrs, params=params, json_body=json_body, data=data
+        )
 
     def _get_auth_headers(self) -> Dict[str, str]:
         if not self.token:
@@ -1282,8 +1282,14 @@ class PuterClient:
             ) as response:
                 response.raise_for_status()
                 parsed: Any = await response.json()
-                if raise_on_api_error and isinstance(parsed, dict) and parsed.get("success") is False:
-                    error_data = parsed.get("error", {}) if isinstance(parsed.get("error"), dict) else {}
+                if (
+                    raise_on_api_error
+                    and isinstance(parsed, dict)
+                    and parsed.get("success") is False
+                ):
+                    error_data = (
+                        parsed.get("error", {}) if isinstance(parsed.get("error"), dict) else {}
+                    )
                     msg = error_data.get("message") or parsed.get("message") or "Unknown API error"
                     code = error_data.get("code")
                     raise ValueError(f"{msg}" + (f" (code: {code})" if code else ""))
@@ -1445,7 +1451,9 @@ class PuterClient:
             json_body=payload,
         )
 
-    async def fs_readdir(self, path: str, options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def fs_readdir(
+        self, path: str, options: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         path = validate_path(path)
         headers = self._get_auth_headers()
         payload = {"path": path}
@@ -1706,7 +1714,9 @@ class PuterClient:
             json_body={"key": key, "seconds": seconds},
         )
 
-    async def kv_expire_at(self, key: str, timestamp: Union[int, float, str, datetime]) -> Dict[str, Any]:
+    async def kv_expire_at(
+        self, key: str, timestamp: Union[int, float, str, datetime]
+    ) -> Dict[str, Any]:
         key = validate_string(key)
         if isinstance(timestamp, datetime):
             ts_value: Any = timestamp.isoformat()
@@ -1768,7 +1778,9 @@ class PuterClient:
                     for url in image_url:
                         if isinstance(url, str) and url.startswith(("http://", "https://")):
                             safe_url = validate_url(url)
-                            content_parts.append({"type": "image_url", "image_url": {"url": safe_url}})
+                            content_parts.append(
+                                {"type": "image_url", "image_url": {"url": safe_url}}
+                            )
                         else:
                             content_parts.append({"type": "file", "puter_path": str(url)})
                     content = content_parts

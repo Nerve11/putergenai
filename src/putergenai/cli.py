@@ -2,7 +2,6 @@ import argparse
 import asyncio
 import os
 import sys
-import json
 from getpass import getpass
 from pathlib import Path
 from typing import Optional
@@ -11,6 +10,7 @@ from .putergenai import PuterClient
 
 TOKEN_FILE = Path.home() / ".puter_token"
 
+
 def save_token(token: str):
     try:
         with open(TOKEN_FILE, "w") as f:
@@ -18,6 +18,7 @@ def save_token(token: str):
         print(f"Token saved to {TOKEN_FILE}")
     except Exception as e:
         print(f"Warning: Could not save token to file: {e}")
+
 
 def load_token() -> Optional[str]:
     if os.environ.get("PUTER_API_TOKEN"):
@@ -30,11 +31,12 @@ def load_token() -> Optional[str]:
             return None
     return None
 
+
 async def login(args):
     print("Puter.com Login")
     username = input("Username: ")
     password = getpass("Password: ")
-    
+
     async with PuterClient() as client:
         try:
             token = await client.login(username, password)
@@ -43,6 +45,7 @@ async def login(args):
         except Exception as e:
             print(f"Login failed: {e}")
             sys.exit(1)
+
 
 async def chat(args):
     token = load_token()
@@ -53,7 +56,7 @@ async def chat(args):
     async with PuterClient(token=token) as client:
         print(f"Starting chat with model {args.model} (type 'exit' to quit)")
         print("-" * 50)
-        
+
         while True:
             try:
                 prompt = input("You: ")
@@ -64,17 +67,21 @@ async def chat(args):
 
                 print("AI: ", end="", flush=True)
                 if args.stream:
-                    async for chunk, _ in await client.ai_chat(prompt, options={"model": args.model, "stream": True}):
+                    async for chunk, _ in await client.ai_chat(
+                        prompt, options={"model": args.model, "stream": True}
+                    ):
                         print(chunk, end="", flush=True)
                     print()
                 else:
-                    result = await client.ai_chat(prompt, options={"model": args.model, "stream": False})
+                    result = await client.ai_chat(
+                        prompt, options={"model": args.model, "stream": False}
+                    )
                     # Attempt to extract content from various response formats
                     content = "No response content found."
-                    
+
                     if isinstance(result, dict):
                         res = result.get("response", {})
-                        
+
                         # Claude/OpenAI standard format
                         if "choices" in res and res["choices"]:
                             content = res["choices"][0].get("message", {}).get("content", "")
@@ -87,14 +94,15 @@ async def chat(args):
                                 content = result_data
                         elif "text" in res:
                             content = res["text"]
-                            
+
                     print(content)
-                    
+
             except KeyboardInterrupt:
                 print("\nExiting...")
                 break
             except Exception as e:
                 print(f"\nError: {e}")
+
 
 async def list_models(args):
     token = load_token()
@@ -111,12 +119,13 @@ async def list_models(args):
         except Exception as e:
             print(f"Error fetching models: {e}")
 
+
 async def kv_cmd(args):
     token = load_token()
     if not token:
         print("Not logged in. Please run 'puter login'.")
         sys.exit(1)
-        
+
     async with PuterClient(token=token) as client:
         try:
             if args.kv_action == "set":
@@ -141,6 +150,7 @@ async def kv_cmd(args):
         except Exception as e:
             print(f"KV Error: {e}")
 
+
 def main():
     parser = argparse.ArgumentParser(description="Puter CLI Tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -150,8 +160,12 @@ def main():
 
     # Chat
     chat_parser = subparsers.add_parser("chat", help="Start an AI chat session")
-    chat_parser.add_argument("--model", default="gpt-4o-mini", help="Model to use (default: gpt-4o-mini)")
-    chat_parser.add_argument("--no-stream", action="store_false", dest="stream", help="Disable streaming response")
+    chat_parser.add_argument(
+        "--model", default="gpt-4o-mini", help="Model to use (default: gpt-4o-mini)"
+    )
+    chat_parser.add_argument(
+        "--no-stream", action="store_false", dest="stream", help="Disable streaming response"
+    )
 
     # Models
     subparsers.add_parser("models", help="List all available AI models")
@@ -159,7 +173,7 @@ def main():
     # KV
     kv_parser = subparsers.add_parser("kv", help="Key-Value Store operations")
     kv_sub = kv_parser.add_subparsers(dest="kv_action", required=True)
-    
+
     kv_set = kv_sub.add_parser("set", help="Set a value")
     kv_set.add_argument("key", help="Key name")
     kv_set.add_argument("value", help="Value to store")
@@ -182,6 +196,7 @@ def main():
         asyncio.run(list_models(args))
     elif args.command == "kv":
         asyncio.run(kv_cmd(args))
+
 
 if __name__ == "__main__":
     main()
